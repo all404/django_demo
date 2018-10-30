@@ -99,7 +99,15 @@ def demo_view(request):
     通过HttpResponse对象中的set_cookie方法来设置cookie。
     HttpResponse.set_cookie(cookie名, value=cookie值, max_age=cookie有效期)
     """
-    response = HttpResponse('OK')
-    response.set_cookie('name1', 'zhangsan')  # 临时Cookie
-    response.set_cookie('name2', 'lisi', max_age=3600)  # 有效期1小时
-    return response
+    # response = HttpResponse('OK')
+    # response.set_cookie('name1', 'zhangsan')  # 临时Cookie
+    # response.set_cookie('name2', 'lisi', max_age=3600)  # 有效期1小时
+    # return response
+
+    """
+    读取Cookie
+    过HttpRequest对象的COOKIES属性来读取本次请求携带的cookie值。request.COOKIES为字典类型。
+    """
+    cookie1 = request.COOKIES['name2']
+    print(cookie1)
+    return HttpResponse('OK')
