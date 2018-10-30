@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'reqresp/(?P<city>[a-z]+)/(?P<year>\d{4})/', views.weather, name='reqresp'),
     url(r'reqresp/getbody/$', views.get_body),
     url(r'reqresp/getjson/$', views.get_body_json),
+    url(r'reqresp/getheaders/$', views.get_headers),
 ]
