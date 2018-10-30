@@ -7,4 +7,5 @@ urlpatterns = [
     # url(r'reqresp/([a-z]+)/(\d{4})/', views.weather, name='reqresp'),
     # 命名参数按名字传递
     url(r'reqresp/(?P<city>[a-z]+)/(?P<year>\d{4})/', views.weather, name='reqresp'),
+    url(r'reqresp/getbody/$', views.get_body),
 ]
