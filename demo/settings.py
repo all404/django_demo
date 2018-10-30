@@ -129,3 +129,22 @@ STATICFILES_DIRS = [
 只有DEBUG=True时,外界才能访问静态文件
 若DEBUG=False,需要设置ALLOWED_HOSTS内容,限定外界谁可以访问
 """
+
+
+"""session的存储方式配置"""
+# SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # 默认数据库,可以不写
+
+# SESSION_ENGINE = 'django.contrib.sessions.backends.cache'  # 本地缓存
+
+# 在redis中保存session，需要引入第三方扩展，我们可以使用django-redis来解决。
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
