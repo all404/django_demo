@@ -27,4 +27,5 @@ urlpatterns = [
     # 也可将工程的全部路由信息都定义在主路由文件中，子应用不再设置urls.py(不常用)
     # url(r'^users/index/$', users.views.index)
     url(r'', include('reqresp.urls', namespace='reqresp')),
+    url(r'', include('classview.urls')),
 ]
