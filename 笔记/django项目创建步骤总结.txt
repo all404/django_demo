@@ -1,0 +1,40 @@
+django项目创建总结:
+	1.创建django主应用
+		django-admin startproject 项目名
+	2.创建子应用
+		python manege.py startapp 子应用名
+	3.注册子应用
+		将子应用的配置信息文件apps.py中的Config类添加到INSTALLED_APPS列表中。
+		例如: 'users.apps.UsersConfig'
+	4.在子应用views.py中创建视图
+		例如创建index视图
+		def index(request):
+			"""
+			第1个参数必须有,用来接收requset请求对象
+			返回值必须是HttpResponse对象或子类对象
+			"""
+			return HttpResponse()
+	5.配置路由
+		1>在子应用urls.py中添加子应用路由
+			例如添加index视图路由
+			urlpatterns = [
+				url('r^index/$', views.index),
+			]
+		2>在主应用urls.py中关联子应用的路由
+			例如关联子应用users的路由
+			urlspatterns = [
+				...,
+				url(r'^users/', include('users.urls'))
+			]
+	6. 配置静态文件
+		1.创建静态文件夹目录
+			例如在根目录/创建static_filescommit
+		2.设置静态文件访问参数
+			在settings.py中配置两个参数
+			1>设置访问url的前缀
+				STATIC_URL = '/static/'
+			2>设置存放url文件的目录
+				STATICFILES_DIRS = [
+					os.path.join(BASE_DIR, 'static_files'),
+				]
+			

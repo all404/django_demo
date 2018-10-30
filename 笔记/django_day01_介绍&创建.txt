@@ -1,0 +1,128 @@
+Gunicorn  uwsgi
+
+1.web框架学习方法
+
+	如何搭建工程程序
+		工程的组建
+		工程的配置
+		路由定义
+		视图函数定义
+
+	如何获取请求数据(操作request对象)
+
+	如何构造响应数据(构造response对象)
+
+	如何使用中间层
+
+	框架提供的其他功能组建的使用
+		数据库
+		模板
+		表单
+		admin
+
+2.django
+	提供项目工程管理的自动化脚本工具
+	数据库ORM支持(对象关系映射 Object Relational Mapping)
+	模板
+	表单
+	Admin管理站点
+	文件管理
+	认证权限
+	session机制
+	缓存
+
+3.MVT模式&MVC模式
+	MVC
+		Model: 模型层, 主要封装对数据库层的访问，对数据库中的数据进行增、删、改、查操作。
+		View: 视图层, 用于封装结果，生成页面展示的html内容。
+		Controller: 控制层, 用于接收请求，处理业务逻辑，与Model和View交互，返回结果。
+	MVT
+		Model: 与MVC中的M功能相同，负责和数据库交互，进行数据处理。
+		View: 与MVC中的C功能相同，接收请求，进行业务处理，返回应答。
+		Template: 与MVC中的V功能相同，负责封装构造要返回的html。
+
+4.django目录结构示例
+	1.项目名:demo
+		demo/ 与项目同名的目录
+			__init_.py
+			settings.py --项目整体配置文件
+			urls.py --url配置文件
+			wsgi.py	--与WSGI兼容的web服务器入口
+		manage.py --整个项目的入口
+	2.创建子应用 python manage.py startapp 子应用名
+		admin.py --跟网站的后台管理站点配置相关。
+		apps.py --用于配置当前子应用的相关信息。
+		migrations/ --此目录用于存放数据库迁移历史文件。
+		models.py --保存数据库模型类。
+		tests.py --用于开发测试用例，编写单元测试。
+		views.py --编写Web应用视图。
+	3.创建视图
+		在views.py中
+		def index(request)
+			视图函数第1个参数必须有,用于接收resuest请求对象;
+		return HttpResponse()
+			必须返回HttpResponse对象
+	4.配置路由
+		1>在子应用目录/创建urls.py
+			urlpatterns = [
+				# url(路径, 视图)
+				url(r'^index/$', views.index)
+			]
+		2>在主应用目录/apps.py 添加应用的路由
+			urlpatterns = [
+				url(r'^admin/', admin.site.urls)
+				url(r'^users/', include('users.urls'))  # 添加应用的路由
+			]
+	5.配置文件setting.py
+		BASE_DIR
+			定义django搜索包,搜索文件的根目录(即项目的根目录)
+		DEBUG=True
+			修改代码文件后程序自动重启; 显示详细的错误追踪信息.
+			若设置为False,需要配置ALLOWED_HOSTS=[]的内容
+
+		配置语言和时区
+			LANGUAGE_CODE='zh-hans'
+			TIME_ZONE='Asia/Shanghai'
+		静态文件
+			url前缀
+				STATIC_URL = '/static/'
+			静态文件夹列表
+				STATICFILES_DIRS = [
+					os.path.join(BASE_DIR, 'static_files'),
+				]
+				# os.path.join()拼接路径,可以兼容不容操作系统
+			注意: Django 仅在调试模式下（DEBUG=True）能对外提供静态文件。
+
+
+5.路由说明
+	1.路由定义(3种方式)
+		url(r'^users/', include('users.urls'))
+		url(r'^users/', include(users.urls)) --需要导入users.urls
+		url(r'^users/index/$', users.views.index) --需要导入users.views
+	2.路由解析顺序
+		从主路由文件中的urlpatterns列表中以由上至下的顺序查找对应路由规则，如果发现规则为include包含，则再进入被包含的urls中的urlpatterns列表由上至下进行查询。
+
+	3.路由命名
+		主应用中,命名空间
+			url(r'^users/', include('users.urls', namespace=users))
+		子应用中
+		url(r'^index/$', views.index, name=index)
+	4.reverse反解析
+		使用reverse()寻找路由
+			指明namesapced
+				reverse('users: index')
+			未指明namespace
+				reverse('index')
+
+	5.'/'问题
+		路由结尾可以加'/'也可以不加
+			加'/'的好处
+				访问url时,无论末尾加不加'/',都能正常访问
+
+	6.app应用配置
+		AppConfig.name属性:
+			表示这个配置类是加载到哪个应用的
+			name='users' --加载到应用users
+		AppConfig.verbose_name
+			用于设置该应用的直观可读的名字，此名字在Django提供的Admin管理站点中会显示
+			例如: verbose_name = '用户管理'
