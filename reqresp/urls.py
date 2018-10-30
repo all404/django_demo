@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'reqresp/getbody/$', views.get_body),
     url(r'reqresp/getjson/$', views.get_body_json),
     url(r'reqresp/getheaders/$', views.get_headers),
+    url(r'reqresp/demoview/$', views.demo_view),
 ]
