@@ -133,8 +133,8 @@ STATICFILES_DIRS = [
 
 """session的存储方式配置"""
 # SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # 默认数据库,可以不写
-
 # SESSION_ENGINE = 'django.contrib.sessions.backends.cache'  # 本地缓存
+# SESSION_ENGINE='django.contrib.sessions.backends.cached_db'  # 混合存储,本机没有才从数据库存取
 
 # 在redis中保存session，需要引入第三方扩展，我们可以使用django-redis来解决。
 CACHES = {
