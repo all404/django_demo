@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 
 # Create your views here.
@@ -89,4 +89,7 @@ def demo_view(request):
     帮助我们将数据转换为json字符串
     设置响应头Content-Type为application/json
     """
-    return JsonResponse({'city': 'beijing', 'weather': 'sunny'})
+    # return JsonResponse({'city': 'beijing', 'weather': 'sunny'})
+
+    """重定向"""
+    return redirect('/static/index.html')
