@@ -108,6 +108,25 @@ def demo_view(request):
     读取Cookie
     过HttpRequest对象的COOKIES属性来读取本次请求携带的cookie值。request.COOKIES为字典类型。
     """
-    cookie1 = request.COOKIES['name2']
-    print(cookie1)
+    # cookie1 = request.COOKIES['name2']
+    # print(cookie1)
+    # return HttpResponse('OK')
+
+    """Session操作"""
+    # 1.以键值对的格式写session
+    request.session['name'] = 'laowang'
+    request.session['age'] = '18'
+    # 2.根据键读取值
+    s = request.session.get('name', None)
+    print(s)
+    # 3.清除所有session,在存储中删除值部分。
+    request.session.clear()
+    s = request.session.get('name', None)
+    print(s)
+    # 4.删除session中的指定键及值，在存储中只删除某个键及对应的值。
+    del request.session['age']
+    # 5.设置session的有效期,单位s, 不设为默认值;SESSION_COOKIE_AGE来设置全局默认值。
+    request.session.set_expiry(3600)
+    # 6.清除session数据,在存储中删除session的整条数据。
+    request.session.flush()
     return HttpResponse('OK')
