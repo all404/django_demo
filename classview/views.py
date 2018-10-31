@@ -36,10 +36,12 @@ class Demoview(View):
     method_decorator的作用是为函数视图装饰器补充第一个self参数，以适配类视图方法。
     """
     # 为全部请求方法添加装饰器
-    @method_decorator(my_decorate)
+    # @method_decorator(my_decorate)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
+    # 为特定方法添加装饰器
+    @method_decorator(my_decorate)
     def get(self, request):
         print('get方法')
         return HttpResponse('ok')
