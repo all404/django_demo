@@ -15,3 +15,23 @@ class RegisterView(View):
     def post(self, request):
         """处理POST请求,实现注册逻辑"""
         return HttpResponse('实现了注册逻辑')
+
+
+# 定义一个为函数视图准备的装饰器
+def my_decorate(func):
+    print('装饰器调用前')
+    def wrapper(request, *args, **kwargs):
+        print('自定义装饰器被调用了')
+        print('请求路径 %s' % request.path)
+        return func(request, *args, **kwargs)
+    return wrapper
+
+
+class Demoview(View):
+    def get(self, request):
+        print('get方法')
+        return HttpResponse('ok')
+
+    def post(self,resquest):
+        print('post方法')
+        return HttpResponse('ok')
