@@ -6,5 +6,6 @@ from classview.views import *
 urlpatterns = [
     url(r'^register/$', RegisterView.as_view(), name='register'),
     #  方法1 再URL配置中装饰
-    url(r'^demo/$', my_decorate(Demoview.as_view()), name='register'),
+    # url(r'^demo/$', my_decorate(Demoview.as_view()), name='register'),
+    url(r'^demo/$', Demoview.as_view(), name='demo'),
 ]
