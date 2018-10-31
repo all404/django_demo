@@ -1,0 +1,163 @@
+1.请求(重点)
+	1.URL路径参数
+		使用正则表达式提取参数
+			未命名参数按定义顺序传递
+			命名参数按名字传递
+	2.Django中的QueryDict对象
+		方法get() --根据键获取值,键不存在返回None
+			如果一个键同时有多个值,取最后一个
+			dict.get('键', 默认值)
+			dict['键']
+		方法get_list() --根据键获取值，值以列表返回,键不存在返回[]
+			dict.get_list('键', 默认值)
+	3.查询字符串Query String
+		通过request.GET属性获取,返回QueryDict对象
+		然后就可以调用get()方法提取字符串参数
+			a_val = request.GET.get('a')
+		查询字符串不区分请求方式，即假使客户端进行POST方式的请求，依然可以通过request.GET获取请求中的查询字符串数据。
+	4.请求体
+		1>表单类型Form Data
+			可以通过request.POST属性获取，返回QueryDict对象。
+			a = request.POST.get('a')
+		2>非表单类型
+			非表单类型的请求体数据，Django无法自动解析，可以通过request.body属性获取最原始的请求体数据，自己按照请求体格式（JSON、XML等）进行解析。request.body返回bytes类型。
+			例如: 获取请求体中JSON数据 {'a':1, 'b':2}
+				json_str = request.body
+				json_str = json_str.decode()
+				req_data = json.loads(json_str)
+	5.请求头
+		可以通过request.META属性获取请求头headers中的数据，request.META为字典类型。
+			content_type = request.META['CONTENT_TYPE']
+			也可以自定义请求头,但是获取的时候需要在前面加上'HTTP_'前缀
+	6.其他HttpRequest对象属性
+		method: 一个字符串，表示请求使用的HTTP方法，常用值包括：'GET'、'POST'。
+		user: 请求的用户对象。
+		path: 一个字符串，表示请求的页面的完整路径，不包含域名和参数部分。
+		encoding：一个字符串，表示提交的数据的编码方式。
+		FILES：一个类似于字典的对象，包含所有的上传文件
+
+2.响应
+	1.HttpResponse
+		可以使用django.http.HttpResponse来构造响应对象。
+			HttpResponse(content=响应体, content_type=响应体数据类型, status=状态码)
+		也可通过HttpResponse对象属性来设置响应体、响应体数据类型、状态码：
+			content：表示返回的内容。
+			status_code：返回的HTTP响应状态码。
+			content_type：指定返回数据的的MIME类型。
+
+	2.HttpResponse子类
+		Django提供了一系列HttpResponse的子类，可以快速设置状态码
+			HttpResponseRedirect 301
+			HttpResponsePermanentRedirect 302
+			HttpResponseNotModified 304
+			HttpResponseBadRequest 400
+			HttpResponseNotFound 404
+			HttpResponseForbidden 403
+			HttpResponseNotAllowed 405
+			HttpResponseGone 410
+			HttpResponseServerError 500
+
+	3.JsonResponse(重点)
+		若要返回json数据，可以使用JsonResponse来构造响应对象
+			帮助我们将数据转换为json字符串;
+			设置响应头Content-Type为 application/json
+			例如: JsonResponse({'city': 'beijing', 'weather': 'sunny'})
+
+	4.redirect重定向
+		redirect() --重定向到其他页面
+			redirect('/static/index.html')
+
+	5.Cookie
+		1设置Cookie
+			HttpResponse.set_cookie(cookie名, value=cookie值, max_age=cookie有效期)
+			max_age 单位为秒，默认为None。如果是临时cookie，可将max_age设置为None。
+		2读取Cookie
+			可以通过HttpRequest对象的COOKIES属性来读取本次请求携带的cookie值。request.COOKIES为字典类型。
+			cookie1 = request.COOKIES.get('name')
+			cookie1 = request.COOKIES.get('age')
+	6.session
+		Django项目默认启用Session,在配置文件MODDLEWARE列表中
+		存储方式:
+		1.数据库
+			默认存储方式,可以写，也可以不写
+			SESSION_ENGINE='django.contrib.sessions.backends.db'
+		2.本地缓存
+			存储在本机内存中，如果丢失则不能找回，比数据库的方式读写更快。
+			SESSION_ENGINE='django.contrib.sessions.backends.cache'
+		3.混合存储
+			优先从本机内存中存取，如果没有则从数据库中存取。
+			SESSION_ENGINE='django.contrib.sessions.backends.cached_db'
+		4.存储在Redis
+			需要引入第三方扩展
+			pip install django-redis
+			在settings.py中做如下配置:
+				CACHES = {
+					"default": {
+						"BACKEND": "django_redis.cache.RedisCache",
+						"LOCATION": "redis://127.0.0.1:6379/1",
+						"OPTIONS": {
+							"CLIENT_CLASS": "django_redis.client.DefaultClient",
+						}
+					}
+				}
+				SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+				SESSION_CACHE_ALIAS = "default"
+	7.session操作
+		1.以键值对的格式写session。
+			request.session['键']=值
+		2.根据键读取值。
+			request.session.get('键',默认值)
+		3.清除所有session，在存储中删除值部分。
+			request.session.clear()
+		4.清除session数据，在存储中删除session的整条数据。
+			request.session.flush()
+		5删除session中的指定键及值，在存储中只删除某个键及对应的值。
+			del request.session['键']
+		6.设置session的有效期
+			request.session.set_expiry(value)
+			如果value为0，那么用户session的Cookie将在用户的浏览器关闭时过期。	如果value为None，那么session有效期将采用系统默认值，在settings.py中设置SESSION_COOKIE_AGE来设置全局默认值。
+
+3.类视图(重点)
+	1.视图引入
+		在Django中也可以使用类来定义一个视图，称为类视图。
+	2.类视图使用(重重点,项目常用)
+		1>需要继承View
+		2>配置路由时，使用类视图的as_view()方法来添加
+	3.类视图原理(了解)
+		了解View类中的as_view()和dispatch()方法
+	4.类视图使用装饰器(3种方法)(难点非重点)
+		1>在URL配置中装饰
+			例如: urlpatterns = [url(r'^demo/$', my_decorate(DemoView.as_view())),]
+		2>在类视图中装饰
+			需要使用method_decorator将其转换为适用于类视图方法的装饰器。
+				@method_decorator(my_decorator)
+				def get(self, request, *args, **kwargs):
+					pass
+			method_decorator装饰器还支持使用name参数指明被装饰的方法
+				@method_decorator(my_decorator, name='get')
+				class DemoView(View):
+					def get():
+						pass
+		为什么要使用method_decorator?
+			为函数视图准备的装饰器，其被调用时，第一个参数用于接收request对象;
+			而类视图中请求方法被调用时，传入的第一个参数不是request对象，而是self 视图对象本身，第二个位置参数才是request对象;
+			method_decorator的作用是为函数视图装饰器补充第一个self参数，以适配类视图方法.
+		3>使用Minin扩展类
+			使用面向对象多继承的特性。
+			class MyDecoratorMixin(object):
+			@classmethod
+			def as_view(cls, *args, **kwargs):
+				view = super().as_view(*args, **kwargs)
+				view = my_decorator(view)
+				return view
+
+			class DemoView(MyDecoratorMixin, View):
+				def get(self, request):
+					print('get方法')
+					return HttpResponse('ok')
+
+				def post(self, request):
+					print('post方法')
+					return HttpResponse('ok')
+
+			使用Mixin扩展类，也会为类视图的所有请求方法都添加装饰行为。
