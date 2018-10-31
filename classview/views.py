@@ -28,6 +28,9 @@ def my_decorate(func):
     return wrapper
 
 
+# 使用name参数指明被装饰的方法
+# @method_decorator(my_decorate, name='dispatch')
+@method_decorator(my_decorate, name='get')
 class Demoview(View):
 
     """
@@ -41,7 +44,7 @@ class Demoview(View):
         return super().dispatch(request, *args, **kwargs)
 
     # 为特定方法添加装饰器
-    @method_decorator(my_decorate)
+    # @method_decorator(my_decorate)
     def get(self, request):
         print('get方法')
         return HttpResponse('ok')
