@@ -1,6 +1,12 @@
 1） 数据库表名
 	模型类如果未指明表名，Django默认以 小写app应用名_小写模型类名 为数据库表名。
 	可通过db_table 指明数据库表名。
+	在数据库模型类中再加一个类Meta,用于指定表名, admin站点显示的名称
+	class Meta:
+        db_table = 'tb_books'  # 指明数据库表名
+        verbose_name = '图书'  # 在admin站点中显示的名称
+        verbose_name_plural = verbose_name  # 显示的复数名称
+
 
 2） 关于主键
 	django会为表创建自动增长的主键列，每个模型只能有一个主键列，如果使用选项设置某属性为主键列后django不会再创建自动增长的主键列。
