@@ -11,7 +11,20 @@ from django.db import models
 class BookInfoManager(models.Manager):
     def all(self):
         # 改为默认查询未删除的图书信息
-        return super().filter(is_delete=Flse)
+        return super().filter(is_delete=False)
+
+    # 在管理器类中补充定义新的方法
+    def create_book(self, title, pub_date):
+        # 创建模型类对象self.model可以获得模型类
+        book = self.model()
+        book.btitle = title
+        book.bpub_date = pub_date
+        book.bread = 0
+        book.bcomment = 0
+        book.is_delete = False
+        # 将数据插入数据表
+        book.save()
+        return book
 
 
 # 定义图书模型类BookInfo
@@ -33,6 +46,7 @@ class BookInfo(models.Model):
     # 2.在模型类中定义管理器
     query = BookInfoManager()
     # 这样,就可以用BookInfo.query.all()查询所有未删除的图书信息
+    # 定义了create_book方法,所以就可以用BookInfo.query.create_book('名称', date(年, 月, 日))创建图书
 
 
 # 定义英雄模型类HeroInfo
