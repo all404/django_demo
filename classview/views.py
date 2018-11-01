@@ -28,23 +28,19 @@ def my_decorate(func):
     return wrapper
 
 
-# 使用name参数指明被装饰的方法
-# @method_decorator(my_decorate, name='dispatch')
-@method_decorator(my_decorate, name='get')
-class Demoview(View):
+# 1.创建一个类集成View,重写as_view()方法添加装饰
+class BaseView(View):
+    def as_view(cls, **initkwargs):
+        view = super().as_view(**initkwargs)
+        view = my_decorate(view)
+        return view
 
-    """
-    在类视图中使用为函数视图准备的装饰器时，不能直接添加装饰器，
-    需要使用method_decorator将其转换为适用于类视图方法的装饰器。
-    method_decorator的作用是为函数视图装饰器补充第一个self参数，以适配类视图方法。
-    """
-    # 为全部请求方法添加装饰器
-    # @method_decorator(my_decorate)
+# 2.让视图类继承上面的类,这样也会为视图函数添加了装饰器
+class Demoview(BaseView):
+
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
-    # 为特定方法添加装饰器
-    # @method_decorator(my_decorate)
     def get(self, request):
         print('get方法')
         return HttpResponse('ok')
@@ -52,3 +48,30 @@ class Demoview(View):
     def post(self,resquest):
         print('post方法')
         return HttpResponse('ok')
+
+
+
+# # 使用name参数指明被装饰的方法
+# # @method_decorator(my_decorate, name='dispatch')
+# @method_decorator(my_decorate, name='get')
+# class Demoview(View):
+#
+#     """
+#     在类视图中使用为函数视图准备的装饰器时，不能直接添加装饰器，
+#     需要使用method_decorator将其转换为适用于类视图方法的装饰器。
+#     method_decorator的作用是为函数视图装饰器补充第一个self参数，以适配类视图方法。
+#     """
+#     # 为全部请求方法添加装饰器
+#     # @method_decorator(my_decorate)
+#     def dispatch(self, request, *args, **kwargs):
+#         return super().dispatch(request, *args, **kwargs)
+#
+#     # 为特定方法添加装饰器
+#     # @method_decorator(my_decorate)
+#     def get(self, request):
+#         print('get方法')
+#         return HttpResponse('ok')
+#
+#     def post(self,resquest):
+#         print('post方法')
+#         return HttpResponse('ok')
