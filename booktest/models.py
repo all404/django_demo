@@ -6,14 +6,14 @@ from django.db import models
 # 定义图书模型类BookInfo
 class BookInfo(models.Model):
     btitle = models.CharField(max_length=20, verbose_name='名称')
-    bpub_date = models.DateField(verbose_name='发布日期')
+    bpub_date = models.DateField(verbose_name='日期')
     bread = models.IntegerField(default=0, verbose_name='阅读量')
     bcomment = models.IntegerField(default=0, verbose_name='评论量')
-    is_delete = models.BooleanField(default=False, verbose_name='逻辑删除')
+    is_delete = models.BooleanField(defult=False, verbose_name='逻辑删除')
 
     class Meta:
         db_table = 'tb_books'  # 指明数据库表名
-        verbose_name = '图书'  # 在admin站点中显示的名称
+        verbose_name = '图书'  # 指明admin站点显示的名称
         verbose_name_plural = verbose_name  # 显示的复数名称
 
     def __str__(self):
@@ -24,13 +24,13 @@ class BookInfo(models.Model):
 # 定义英雄模型类HeroInfo
 class HeroInfo(models.Model):
     GENDER_CHOICES = (
-        (0, 'male'),
-        (1, 'female')
+        (0, "male"),
+        (1, "female")
     )
     hname = models.CharField(max_length=20, verbose_name='名称')
     hgender = models.SmallIntegerField(choices=GENDER_CHOICES, default=0, verbose_name='性别')
     hcomment = models.CharField(max_length=200, null=True, verbose_name='描述信息')
-    hbook = models.ForeignKey(BookInfo, on_delete=models.CASCADE, verbose_name='图书')  # 外键
+    hbook = models.ForeignKey(BookInfo, on_delete=models.CASCADE, verbose_name='图书')
     is_delete = models.BooleanField(default=False, verbose_name='逻辑删除')
 
     class Meta:

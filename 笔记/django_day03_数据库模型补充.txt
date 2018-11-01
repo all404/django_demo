@@ -1,0 +1,109 @@
+1） 数据库表名
+	模型类如果未指明表名，Django默认以 小写app应用名_小写模型类名 为数据库表名。
+	可通过db_table 指明数据库表名。
+
+2） 关于主键
+	django会为表创建自动增长的主键列，每个模型只能有一个主键列，如果使用选项设置某属性为主键列后django不会再创建自动增长的主键列。
+	默认创建的主键列属性为id，可以使用pk代替，pk全拼为primary key。
+
+3） 属性命名限制
+	不能是python的保留关键字。
+	不允许使用连续的下划线，这是由django的查询方式决定的。
+	定义属性时需要指定字段类型，通过字段类型的参数指定选项，语法如下：
+		属性=models.字段类型(选项)
+
+4）字段类型
+	AutoField	自动增长的IntegerField，通常不用指定，不指定时Django会自动创建属性名为id的自动增长属性
+	
+	BooleanField	布尔字段，值为True或False
+	
+	NullBooleanField	支持Null、True、False三种值
+	
+	CharField	字符串，参数max_length表示最大字符个数
+	
+	TextField	大文本字段，一般超过4000个字符时使用
+	
+	IntegerField	整数
+	
+	DecimalField	十进制浮点数， 参数max_digits表示总位数， 参数decimal_places表示小数位数
+	
+	FloatField	浮点数
+	
+	DateField	日期， 参数auto_now表示每次保存对象时，自动设置该字段为当前时间，
+				用于"最后一次修改的时间戳，它总是使用当前日期，默认为False；
+				参数auto_now_add表示当对象第一次被创建时自动设置当前时间，
+				用于创建的时间戳，它总是使用当前日期，默认为False; 
+				参数auto_now_add和auto_now是相互排斥的，组合将会发生错误
+				
+	TimeField	时间，参数同DateField
+	
+	DateTimeField	日期时间，参数同DateField
+	
+	FileField	上传文件字段
+	
+	ImageField	继承于FileField，对上传的内容进行校验，确保是有效的图片
+	
+5） 选项
+	null	如果为True，表示允许为空，默认值是False
+	blank	如果为True，则该字段允许为空白，默认值是False
+	# null是数据库范畴的概念，blank是表单验证范畴的
+	
+	db_column	字段的名称，如果未指定，则使用属性的名称
+	db_index	若值为True, 则在表中会为此字段创建索引，默认值是False
+	default	默认
+	primary_key	若为True，则该字段会成为模型的主键字段，默认值是False，一般作为AutoField的选项使用
+	unique	如果为True, 这个字段在表中必须有唯一值，默认值是False
+	
+6） 外键
+	在设置外键时，需要通过on_delete选项指明主表删除数据时，对于外键引用表数据如何处理，在django.db.models中包含了可选常量：
+		CASCADE 级联，删除主表数据时连通一起删除外键表中数据
+
+		PROTECT 保护，通过抛出ProtectedError异常，来阻止删除主表中被外键应用的数据
+
+		SET_NULL 设置为NULL，仅在该字段null=True允许为null时可用
+
+		SET_DEFAULT 设置为默认值，仅在该字段设置了默认值时可用
+
+		SET() 设置为特定值或者调用特定方法，如:
+		
+			from django.conf import settings
+			from django.contrib.auth import get_user_model
+			from django.db import models
+
+			def get_sentinel_user():
+				return get_user_model().objects.get_or_create(username='deleted')[0]
+
+			class MyModel(models.Model):
+				user = models.ForeignKey(
+					settings.AUTH_USER_MODEL,
+					on_delete=models.SET(get_sentinel_user), # 调用get_sentinel_user()方法
+				)
+	
+		DO_NOTHING 不做任何操作，如果数据库前置指明级联性，此选项会抛出IntegrityError异常
+
+		
+其他补充:
+1 shell工具(方便写临时代码,类似ipython)
+	Django的manage工具提供了shell命令，帮助我们配置好当前工程的运行环境（如连接好数据库等），以便可以直接在终端中执行测试python语句。
+
+	通过如下命令进入shell
+		python manage.py shell
+		django shell
+
+	导入两个模型类，以便后续使用
+		from booktest.models import BookInfo, HeroInfo
+		
+		
+2 查看MySQL数据库日志
+	查看mysql数据库日志可以查看对数据库的操作记录。 mysql日志文件默认没有产生，需要做如下配置：
+
+	sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+	mysql 日志
+
+	把68，69行前面的#去除，然后保存并使用如下命令重启mysql服务。
+
+	sudo service mysql restart
+	使用如下命令打开mysql日志文件。
+
+	tail -f /var/log/mysql/mysql.log  # 可以实时查看数据库的日志内容
+
