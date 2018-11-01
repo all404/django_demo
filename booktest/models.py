@@ -2,6 +2,17 @@ from django.db import models
 
 # Create your models here.
 
+"""
+我们在通过模型类的objects属性提供的方法操作数据库时，即是在使用一个管理器对象objects。
+它是models.Manager类的对象。
+我们可以自定义管理器，并应用到我们的模型类上。
+"""
+# 1.修改原始查询集，重写all()方法
+class BookInfoManager(models.Manager):
+    def all(self):
+        # 改为默认查询未删除的图书信息
+        return super().filter(is_delete=Flse)
+
 
 # 定义图书模型类BookInfo
 class BookInfo(models.Model):
@@ -19,6 +30,9 @@ class BookInfo(models.Model):
     def __str__(self):
         """定义每个数据对象的显示信息"""
         return self.btitle
+    # 2.在模型类中定义管理器
+    query = BookInfoManager()
+    # 这样,就可以用BookInfo.query.all()查询所有未删除的图书信息
 
 
 # 定义英雄模型类HeroInfo
