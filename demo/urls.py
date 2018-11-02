@@ -28,4 +28,5 @@ urlpatterns = [
     # url(r'^users/index/$', users.views.index)
     url(r'', include('reqresp.urls', namespace='reqresp')),
     url(r'', include('classview.urls')),
+    url(r'^', include('booktest.urls')),
 ]
