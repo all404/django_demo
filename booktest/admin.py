@@ -7,6 +7,7 @@ admin.site.site_header = '图书管理'  # 设置网站页头
 admin.site.site_title = '图书'  # 设置页面标题
 admin.site.index_title = '后台管理'  # 设置首页标语
 
+
 # 关联对象(一对多)
 # 然后要在BookInfoAdmin中增加属性inlines = [BookStackedInline]
 class BookStackedInline(admin.TabularInline):
@@ -18,6 +19,7 @@ class BookStackedInline(admin.TabularInline):
 # 管理员登陆页面 http://127.0.0.1:8000/admin/
 # 注册模型类方法1:
 class BookInfoAdmin(admin.ModelAdmin):
+    list_display = ['btitle', 'bpub_date', 'image']
 
     # 编辑页面展示
     # 显示内容&顺序
@@ -25,9 +27,8 @@ class BookInfoAdmin(admin.ModelAdmin):
     # 分组显示(和上面的fields选一个设置)
     fieldsets = (
         ('基本', {'fields': ['btitle']}),
-        ('高级', {'fields': ['bpub_date', 'bread']})
+        ('高级', {'fields': ['bpub_date', 'bread', 'image']})
     )
-
     # 关联对象(一对多)
     inlines = [BookStackedInline]
 

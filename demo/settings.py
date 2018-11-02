@@ -163,3 +163,6 @@ CACHES = {
 }
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
+
+# 1.在settings.py中配置上传图片的根目录
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static_files/media')

@@ -35,6 +35,9 @@ class BookInfo(models.Model):
     bcomment = models.IntegerField(default=0, verbose_name='评论量')
     is_delete = models.BooleanField(default=False, verbose_name='逻辑删除')
 
+    # 2.在模型类添加图片字段(然后做数据库迁移)
+    image = models.ImageField(upload_to='booktest', verbose_name='图片', null=True)
+
     class Meta:
         db_table = 'tb_books'  # 指明数据库表名
         verbose_name = '图书'  # 指明admin站点显示的名称
@@ -83,7 +86,6 @@ class HeroInfo(models.Model):
     # admin站点显示的列名
     parent.short_description = '书籍名称'
     parent.admin_order_field = 'hbook__btitle'
-
 
     def __str__(self):
         return self.hname
