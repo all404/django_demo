@@ -6,18 +6,23 @@ from django.template import loader
 from django.views import View
 
 
+from .forms import BookForm
+
+
 class BookView(View):
-
     def get(self, request):
+        # 2.视图中使用表单类
+        form = BookForm
+        return render(request, 'book.html', {'form': form})
 
-        """渲染模板普通写法"""
-        # # 1.加载模板
-        # template = loader.get_template('index.html')
-        # # 2.渲染模板
-        # return HttpResponse(template.render({"city": "北京"}))
+    def post(self, request):
+        # 2.视图中使用表单类,并获取提交的数据
+        form = BookForm(request.POST)
+        if form.is_valid():  # 验证表单数据
+            print(form.cleaned_data)  # 获取验证后的表单数据
+            return HttpResponse("OK")
+        return render(request, 'book.html', {'form': form})
 
-        """渲染模板简写"""
-        return render(request, 'index.html', {"city": "西安"})
 
 
 class IndexView(View):
