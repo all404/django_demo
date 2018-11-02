@@ -1,0 +1,165 @@
+1.模板使用
+	1 配置
+		在工程中创建模板目录templates。
+		在settings.py配置文件中修改TEMPLATES配置项的DIRS值：
+		TEMPLATES = [
+			{
+				...
+				'DIRS': [os.path.join(BASE_DIR, 'templates')],  # 此处修改
+				...
+			}
+		]
+	2 定义模板
+		在templates目录中新建一个模板文件，如index.html
+	
+	3 模板渲染
+		1>找到模板
+			template=loader.get_template('index.html')
+		2>渲染模板
+			return HttpResponse(template.render({"name":"laowang"}))
+		简单写法
+			render(request, 'index.html', {"name":"laowang"})
+	4 模板语法
+	4.1模板变量
+		变量名必须由字母、数字、下划线（不能以下划线开头）和点组成.
+		语法: {{变量}}
+		
+	4.2模板语句
+	注意：运算符左右两侧不能紧挨变量或常量，必须有空格
+		1）for循环：
+			{% for item in aList%}
+				{{item}}
+			{% empty %}
+				若遍历没有内容,这里内容显示
+			{% endfor %}
+		2）if条件：
+			{% if x = ? %}
+				
+			{% endif %}
+	4.3过滤器
+		语法: 变量 | 过滤器:参数
+	
+	4.4注释
+		ctrl + /
+	4.5模板继承
+		父模板	
+		子模板
+	
+2.表单使用
+	1 定义表单类
+		新建forms.py文件,在里面定义表单类
+		class BookForm(forms.Form):
+			btitle = form.CharField(label='标题',max_length=20, required=True)
+			bpub_date = forms.DateField(label='发行日期', required=True)
+	2 视图中使用表单类
+		class BookView(View):
+			def get(self, request):
+				form = BookForm()
+				return render(request, 'book.html', {"form": form})
+			def post(self, request):
+				form = BookForm(request.POST)
+				if form.is_valid():  # 判断数据是否合法
+					# 获取提交的数据
+					data = form.cleaned_data
+					print(data)
+					return HttpResponse('ok')
+				return render(request, 'book.html', {"form": form})
+	
+	3 模板中使用表单类
+		<form method='post'>
+			{% csrf_token %}
+			{{ form }}
+			<input type='submit'>
+		</form>
+	
+	4 模型类表单
+		如果表单中的数据与模型类对应，可以通过继承forms.ModelForm更快速的创建表单。
+			class BookForm(forms.ModelForm):
+				class Meta:
+					model = BookInfo
+					fields = ('btitle', 'bpub_date')
+		model 指明从属于哪个模型类
+		fields 指明向表单中添加模型类的哪些字段
+	
+3.Admin站点
+	1 使用Admin站点
+		1>管理界面本地化
+			在settings.py中设置语言和时区
+				LANGUAGE_CODE = 'zh-hans' # 使用中国语言
+				TIME_ZONE = 'Asia/Shanghai' # 使用中国上海时间		
+		2>创建超级管理员				
+			创建管理员的命令如下，按提示输入用户名、邮箱、密码。
+				python manage.py createsuperuser		
+		3>注册模型类
+			在admin.py中注册模型类
+				注册参数方式
+				admin.site.register(BookInfo)
+				装饰器方式
+				@admin.register(BookInfo)
+				class BookInfoAdmin(admin.ModelAdmin):
+					pass		
+		4>定义与使用Admin管理类
+			class BookInfoAdmin(admin.ModelAdmin)):
+				pass
+			
+	
+	2 调整列表页展示
+		页大小
+			list_per_page = 2
+		"操作选项"的位置
+			actions_on_top = True
+			actions_on_bottom = False
+		列表中显示的列
+			list_display = ["id","btitle","bpub_date"]
+		将方法作为列
+				在模型类中定义方法
+				def pub_date(self):
+					return self.bpub_date.strftime('%Y-%m-%d')
+				pub_date.admin_order_field='bpub_date'
+				pub_date.short_description = "发行日期"
+		列标题
+			列属性.short_description = "列标题"
+		关联对象
+			
+		右侧栏过滤器
+			list_filds = []
+		搜索框
+			search_fields = []
+		中文标题
+			在模型类中为属性指定Verbose_name
+	3 调整编辑页展示
+		需要显示的字段&顺序
+			fileds = []
+		分组显示
+			 fieldsets = (
+				('基本', {'fields': ['atitle']}),
+				('高级', 
+				{'fields': ['aParent'], 'classes': ('collapse',)} # 是否折叠
+				)
+			)
+		关联对象
+			类InlineModelAdmin：表示在模型的编辑页面嵌入关联模型的编辑
+			子类TabularInline: 以表格的形式嵌入。
+			子类StackedInline: 以块的形式嵌入。
+	4 重写模板
+		1）在templates/目录下创建admin目录;
+		2）打开当前虚拟环境中Django的目录，再向下找到admin的模板;
+		3）将需要更改文件拷贝到第一步建好的目录里,如base_site.html;
+		4）编辑base_site.html文件.
+	5 调整站点信息
+		在admin.py中增加
+			admin.site.site_header 设置网站页头
+			admin.site.site_title 设置页面标题
+			admin.site.index_title 设置首页标语
+	6 上传图片
+		1.在settings.py中配置上传图片的根目录
+			MEDIA_ROOT = os.path.join(BASE_DIR, 'static_files/media')
+		2.在模型类添加图片字段
+			image = models.ImageField(upload_to='booktest', verbose_name='图片', null=True)
+		3.数据库迁移
+			python manage.py makemigrations
+			python manage.py migrate
+		4.使用Admin站点上传图片
+		
+	
+	
