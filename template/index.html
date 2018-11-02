@@ -6,5 +6,30 @@
 </head>
 <body>
 <h1>{{ city }}</h1>
+<h2>{{ alist }}</h2>
+<h3>{{ adict }}</h3>
+<h4>{{ adict.name }}</h4>
+<h4>{{ adict.age }}</h4>
+<p>
+{#for循环的写法#}
+{% for item in alist %}
+    {{ item }}
+{% empty %}
+    遍历为空或者不存在,显示这里的逻辑
+{% endfor %}
+</p>
+<p>
+{#if条件判断的写法#}
+{% if adict.age >= 18 %}
+    laowang满18岁了
+{% else %}
+    laowang未满18
+{% endif %}
+</p>
+
+<p>
+{#过滤器的使用#}
+alist的长度是:{{ alist | length }}
+</p>
 </body>
 </html>
