@@ -52,8 +52,8 @@ class BookInfo(models.Model):
 # 定义英雄模型类HeroInfo
 class HeroInfo(models.Model):
     GENDER_CHOICES = (
-        (0, "male"),
-        (1, "female")
+        (0, "female"),
+        (1, "male")
     )
     hname = models.CharField(max_length=20, verbose_name='名称')
     hgender = models.SmallIntegerField(choices=GENDER_CHOICES, default=0, verbose_name='性别')
@@ -65,6 +65,25 @@ class HeroInfo(models.Model):
         db_table = 'tb_heros'
         verbose_name = '英雄'
         verbose_name_plural = verbose_name
+
+    def gender(self):
+        if self.hgender == 0:
+            gen = '男'
+        else:
+            gen = '女'
+        return gen
+    gender.admin_order_field = 'hgender'  # 排序依据
+    gender.short_description = '男/女'  # admin站点显示的列标题
+
+    # 关联对象(多对一)
+    def parent(self):
+        if self.hbook is None:
+            return ""
+        return self.hbook.btitle
+    # admin站点显示的列名
+    parent.short_description = '书籍名称'
+    parent.admin_order_field = 'hbook__btitle'
+
 
     def __str__(self):
         return self.hname
