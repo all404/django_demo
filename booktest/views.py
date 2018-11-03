@@ -21,15 +21,21 @@ def serialize(request):
     book = BookInfo.query.get(id=1)
     # 初始化序列化器,需要把模型对象传给序列化器
     serializer = BookInfoSerializer(book)
+
+    # 若查询出来的是查询结果集,需要指定many参数
+    books = BookInfo.query.all()
+    serializer2 = BookInfoSerializer(books, many=True)
+
     # 序列化成功的结果
     print(serializer.data)
     print(type(serializer.data))
+    print(serializer2.data)
     return HttpResponse('序列化成功! %s' % serializer.data)
 
 # 执行反序列化的视图
 def deserialize(request):
     # 模拟客户端提交的数据
-    data = {'btitle': '倚天屠龙记', 'bpub_date': '1999-10-10', 'id': 1, 'bread': 0, 'bcomment': 0}
+    data = {'btitle': '倚天屠龙记', 'bpub_date': '1999-10-10'}
     # 初始化序列化器,需要把数据传给参数data
     serializer = BookInfoSerializer(data=data)
     # 获取校验的结果
