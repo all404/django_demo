@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from booktest.models import BookInfo
+
 
 class BookInfoSerializer(serializers.Serializer):
     id = serializers.IntegerField(label='ID', required=False, read_only=True)
@@ -32,3 +34,26 @@ trim_whitespace	是否截断空白字符
 max_value	最小值
 min_value	最大值
 """
+
+
+# 模型类序列化器
+class BookInfoModelSerializer(serializers.ModelSerializer):
+    """图书模型类序列化器"""
+    class Meta:
+        model = BookInfo
+        # fields = '__all__'
+        fields = ('id', 'btitle', 'bpub_date')
+        exclude = ('image', )
+        read_only_fields = ('id', 'bread', 'bcomment')
+        depth = 1
+        extra_kwargs = {
+            'bread': {'min_value': 0, 'required': True},
+            'bcomment': {'max_value': 0, 'required': True},
+        }
+
+    # model 指明参照哪个模型类
+    # fields 指明模型类的哪些字段(__all__为所有字段)
+    # exclude 明确排除掉哪些字段
+    # read_only_fields 指明只读字段
+    # depth 生成嵌套表示，depth应该是整数，表明嵌套的层级数量?????
+    # extra_kwargs参数为ModelSerializer添加或修改原有的选项参数
