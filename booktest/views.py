@@ -13,6 +13,34 @@ from booktest.models import BookInfo
 from .forms import BookForm
 
 
+# 使用序列化器
+from .serializers import BookInfoSerializer
+# 执行序列化的视图
+def serialize(request):
+    # 从数据库中查询出模型对象
+    book = BookInfo.query.get(id=1)
+    # 初始化序列化器,需要把模型对象传给序列化器
+    serializer = BookInfoSerializer(book)
+    # 序列化成功的结果
+    print(serializer.data)
+    print(type(serializer.data))
+    return HttpResponse('序列化成功! %s' % serializer.data)
+
+# 执行反序列化的视图
+def deserialize(request):
+    # 模拟客户端提交的数据
+    data = {'btitle': '倚天屠龙记', 'bpub_date': '1999-10-10', 'id': 1, 'bread': 0, 'bcomment': 0}
+    # 初始化序列化器,需要把数据传给参数data
+    serializer = BookInfoSerializer(data=data)
+    # 获取校验的结果
+    print(serializer.is_valid())
+    # 校验失败的错误信息
+    print(serializer.errors)
+    # 校验成功的干净的数据(返回的是有序字典OrderedDict)
+    print(serializer.validated_data)
+    return HttpResponse('反序列化结束!!! %s' % serializer.validated_data)
+
+
 class BookView(View):
     def get(self, request):
         # 2.视图中使用表单类
