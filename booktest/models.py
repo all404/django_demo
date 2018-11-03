@@ -47,7 +47,7 @@ class BookInfo(models.Model):
         """定义每个数据对象的显示信息"""
         return self.btitle
     # 2.在模型类中定义管理器
-    # query = BookInfoManager()
+    query = BookInfoManager()
     # 这样,就可以用BookInfo.query.all()查询所有未删除的图书信息
     # 定义了create_book方法,所以就可以用BookInfo.query.create_book('名称', date(年, 月, 日))创建图书
 

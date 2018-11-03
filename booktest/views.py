@@ -49,7 +49,7 @@ class BooksAPIView(View):
          获取所有图书
          路由 GET /books/
         """
-        queryset = BookInfo.objects.all()
+        queryset = BookInfo.query.all()
         book_list = []
         for book in queryset:
             b = {
@@ -73,7 +73,7 @@ class BooksAPIView(View):
         json_str = json_bytes.decode()
         json_dict = json.loads(json_str)
         # 作为测试,详细校验的代码省略
-        book = BookInfo.objects.create(
+        book = BookInfo.query.create(
             btitle=json_dict.get('btitle'),
             bpub_date=datetime.strptime(json_dict.get('bpub_date'), '%Y-%m-%d').date()
         )
@@ -97,7 +97,7 @@ class BookAPIView(View):
          路由 GET /book/pk
         """
         try:
-            book = BookInfo.objects.get(pk=pk)
+            book = BookInfo.query.get(pk=pk)
         except BookInfo.DoesNotExist:
             return HttpResponse(status=404)
         return JsonResponse({
@@ -115,7 +115,7 @@ class BookAPIView(View):
         路由 PUT /book/pk
         """
         try:
-            book = BookInfo.objects.get(pk=pk)
+            book = BookInfo.query.get(pk=pk)
         except BookInfo.DoesNotExist:
             return HttpResponse(status=404)
 
@@ -141,7 +141,7 @@ class BookAPIView(View):
          路由 DELETE /book/pk
         """
         try:
-            book = BookInfo.objects.get(pk=pk)
+            book = BookInfo.query.get(pk=pk)
         except BookInfo.DoesNotExist:
             return HttpResponse(status=404)
         book.delete()
