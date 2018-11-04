@@ -42,7 +42,7 @@ class BookInfoModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookInfo
         # fields = '__all__'
-        fields = ('id', 'btitle', 'bpub_date')
+        # fields = ('id', 'btitle', 'bpub_date')
         exclude = ('image', )
         read_only_fields = ('id', 'bread', 'bcomment')
         depth = 1

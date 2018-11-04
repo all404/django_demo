@@ -167,3 +167,11 @@ SESSION_CACHE_ALIAS = "default"
 
 # 1.在settings.py中配置上传图片的根目录
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static_files/media')
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (  # 默认响应渲染类
+        'renders.DRFJSONRenderer',
+        'rest_framework.renderers.JSONRenderer',  # json渲染器
+        'rest_framework.renderers.BrowsableAPIRenderer',  # 浏览API渲染器
+    )
+}
