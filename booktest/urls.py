@@ -1,6 +1,7 @@
 from django.conf.urls import url
 
 from booktest import views
+from booktest import views_old
 
 urlpatterns = [
     # url(r'^booktest/$', views.BookView.as_view(), name="booktest"),
@@ -11,4 +12,7 @@ urlpatterns = [
     # url(r'^deser/$', views.deserialize),
     url(r'^books/$', views.BookListView.as_view()),
     url(r'^books/(?P<pk>\d+)$', views.BookDetailView.as_view()),
+    url(r'^index/$', views_old.IndexView.as_view()),
+    url(r'^book/$', views_old.BooksAPIView.as_view()),
+    url(r'^book/(?P<pk>\d+)$', views_old.BookAPIView.as_view()),
 ]

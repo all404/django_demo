@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from booktest.models import BookInfo
+from booktest.models import BookInfo, HeroInfo
 
 
 class BookInfoSerializer(serializers.Serializer):
@@ -57,3 +57,11 @@ class BookInfoModelSerializer(serializers.ModelSerializer):
     # read_only_fields 指明只读字段
     # depth 生成嵌套表示，depth应该是整数，表明嵌套的层级数量?????
     # extra_kwargs参数为ModelSerializer添加或修改原有的选项参数
+
+
+class HeroInfoSerializer(serializers.Serializer):
+    class Meta:
+        model = HeroInfo
+        fields = '__all__'
+        read_only_fields = ('id',)
+        depth = 1
