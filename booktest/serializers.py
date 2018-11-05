@@ -55,6 +55,7 @@ class BookInfoModelSerializer(serializers.ModelSerializer):
         # fields = ('id', 'btitle', 'bpub_date')
         exclude = ('image', )
         read_only_fields = ('id', 'bread', 'bcomment')
+        write_only_fields = ('is_delete',)
         depth = 1
         extra_kwargs = {
             'bread': {'min_value': 0, 'required': True},
