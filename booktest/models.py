@@ -61,7 +61,7 @@ class HeroInfo(models.Model):
     hname = models.CharField(max_length=20, verbose_name='名称')
     hgender = models.SmallIntegerField(choices=GENDER_CHOICES, default=0, verbose_name='性别')
     hcomment = models.CharField(max_length=200, null=True, verbose_name='描述信息')
-    hbook = models.ForeignKey(BookInfo, on_delete=models.CASCADE, verbose_name='图书')
+    hbook = models.ForeignKey(BookInfo, on_delete=models.CASCADE, verbose_name='图书', default=None)
     is_delete = models.BooleanField(default=False, verbose_name='逻辑删除')
 
     class Meta:

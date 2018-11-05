@@ -182,12 +182,12 @@
 #         return HttpResponse(status=204)
 
 
-from rest_framework.generics import GenericAPIView
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
-from booktest.models import BookInfo
-from booktest.serializers import BookInfoModelSerializer
+# from rest_framework.generics import GenericAPIView
+# from rest_framework.response import Response
+# from rest_framework.views import APIView
+#
+# from booktest.models import BookInfo
+# from booktest.serializers import BookInfoModelSerializer
 
 
 # class BookListView(APIView):
@@ -205,38 +205,80 @@ from booktest.serializers import BookInfoModelSerializer
 #         serializer = BookInfoModelSerializer(book, data=request.data)
 
 
-class BookListView(GenericAPIView):
+# class BookListView(GenericAPIView):
+#
+#     # 指定查询结果集
+#     queryset = BookInfo.query.all()
+#     # 指定序列化器类
+#     serializer_class = BookInfoModelSerializer
+#
+#     def get(self, request):
+#         # 获取查询结果集
+#         books = self.get_queryset()
+#         # 获取序列化器对象
+#         serializer = self.get_serializer(books, many=True)
+#         return Response(serializer.data)
+#
+#
+# class BookDetailView(GenericAPIView):
+#     # 指定查询结果集
+#     # queryset = BookInfo.query.all()
+#     # 指定序列化器类
+#     # serializer_class = BookInfoModelSerializer
+#     lookup_field = 'pk'  # 查询单一数据库对象时使用的字段名，默认为'pk'
+#     lookup_url_kwarg = 'pk'  # 查询单一数据时URL中的参数关键字名称，默认'pk'
+#
+#     # 可以重写get_queryset()方法返回查询结果集
+#     def get_queryset(self):
+#         return BookInfo.query.all()
+#
+#     # 重写get_serializer_class()方法指定序列化器
+#     def get_serializer_class(self):
+#         return BookInfoModelSerializer
+#
+#     def get(self, request, pk):
+#         book = self.get_object()  # 获取单个数据
+#         serializer = self.get_serializer(book)
+#         return Response(serializer.data)
 
-    # 指定查询结果集
+from rest_framework.generics import GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, \
+    DestroyModelMixin
+
+from booktest.models import BookInfo, HeroInfo
+from booktest.serializers import BookInfoModelSerializer, HeroInfoSerializer, HeroInfoModelSerializer
+
+
+class BookListView(ListModelMixin, CreateModelMixin, GenericAPIView):
     queryset = BookInfo.query.all()
-    # 指定序列化器类
     serializer_class = BookInfoModelSerializer
 
     def get(self, request):
-        # 获取查询结果集
-        books = self.get_queryset()
-        # 获取序列化器对象
-        serializer = self.get_serializer(books, many=True)
-        return Response(serializer.data)
+        return super().list(self, request)
+
+    def post(self, request):
+        return self.create(request)
 
 
-class BookDetailView(GenericAPIView):
-    # 指定查询结果集
-    # queryset = BookInfo.query.all()
-    # 指定序列化器类
-    # serializer_class = BookInfoModelSerializer
-    lookup_field = 'pk'  # 查询单一数据库对象时使用的字段名，默认为'pk'
-    lookup_url_kwarg = 'pk'  # 查询单一数据时URL中的参数关键字名称，默认'pk'
-
-    # 可以重写get_queryset()方法返回查询结果集
-    def get_queryset(self):
-        return BookInfo.query.all()
-
-    # 重写get_serializer_class()方法指定序列化器
-    def get_serializer_class(self):
-        return BookInfoModelSerializer
+class BookDetailView(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericAPIView):
+    queryset = BookInfo.query.all()
+    serializer_class = BookInfoModelSerializer
 
     def get(self, request, pk):
-        book = self.get_object()  # 获取单个数据
-        serializer = self.get_serializer(book)
-        return Response(serializer.data)
+        return self.retrieve(request, pk)
+
+    def put(self, request, pk):
+        return self.update(request, pk)
+
+    def delete(self, request, pk):
+        return self.destroy(request, pk)
+
+
+class HeroListView(ListCreateAPIView):
+    queryset = HeroInfo.objects.all()
+    serializer_class = HeroInfoModelSerializer
+
+
+class HeroDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = HeroInfo.objects.all()
+    serializer_class = HeroInfoModelSerializer

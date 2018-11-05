@@ -9,7 +9,17 @@ class BookInfoSerializer(serializers.Serializer):
     bpub_date = serializers.DateField(label='发行日期', allow_null=True)
     bread = serializers.IntegerField(label='阅读量', required=False, default=0)
     bcomment = serializers.IntegerField(label='评论量', required=False, default=0)
-    is_delete = serializers.BooleanField(label='逻辑删除', required=False, write_only=True)
+
+
+class HeroInfoSerializer(serializers.Serializer):
+    GENDER_CHOICES = (
+        ('0', 'female'),
+        ('1', 'male')
+    )
+    id = serializers.IntegerField(label='ID', required=False, read_only=True)
+    hname = serializers.CharField(label='名称', max_length=20)
+    hcomment = serializers.CharField(label='描述信息', required=False, default=0)
+    hgender = serializers.ChoiceField(choices=GENDER_CHOICES, label='性别', required=True)
 
 
 """
@@ -48,7 +58,7 @@ class BookInfoModelSerializer(serializers.ModelSerializer):
         depth = 1
         extra_kwargs = {
             'bread': {'min_value': 0, 'required': True},
-            'bcomment': {'max_value': 0, 'required': True},
+            'bcomment': {'max_value': 0, 'required': True}
         }
 
     # model 指明参照哪个模型类
@@ -59,9 +69,12 @@ class BookInfoModelSerializer(serializers.ModelSerializer):
     # extra_kwargs参数为ModelSerializer添加或修改原有的选项参数
 
 
-class HeroInfoSerializer(serializers.Serializer):
+class HeroInfoModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = HeroInfo
-        fields = '__all__'
+        # fields = '__all__'
+        # fields = ('hname', 'hgender', 'hcomment', 'hbook')
+        exclude = ('is_delete', )
         read_only_fields = ('id',)
-        depth = 1
+        write_only_fields = ('is_delete',)
+        # depth = 1
