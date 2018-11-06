@@ -1,4 +1,4 @@
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, \
     DestroyModelMixin
 from rest_framework.response import Response
@@ -93,26 +93,48 @@ GenericAPIView的用法
 
 
 """
-class BookListView(ListModelMixin, CreateModelMixin, GenericAPIView):
+# class BookListView(ListModelMixin, CreateModelMixin, GenericAPIView):
+#     queryset = BookInfo.query.all()
+#     serializer_class = BookInfoModelSerializer
+#
+#     def get(self, request):
+#         return self.list(request)
+#
+#     def post(self, request):
+#         return self.create(request)
+#
+#
+# class BookDetailView(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericAPIView):
+#     queryset = BookInfo.query.all()
+#     serializer_class = BookInfoModelSerializer
+#
+#     def get(self, request, pk):
+#         return self.retrieve(request, pk)
+#
+#     def put(self, request, pk):
+#         return self.update(request, pk)
+#
+#     def delete(self, request, pk):
+#         return self.destroy(request, pk)
+
+
+"""
+几个可用子类视图的使用
+1）ListAPIView --提供 get 方法,继承自：GenericAPIView、ListModelMixin
+2）CreateAPIView --提供 post 方法,继承自： GenericAPIView、CreateModelMixin
+3)ListCreateAPIView --提供 get post 方法,继承自：GenericAPIView、ListModelMixin、CreateModelMixin
+4）RetireveAPIView --提供 get 方法,继承自: GenericAPIView、RetrieveModelMixin
+5）DestoryAPIView --提供 delete 方法,继承自：GenericAPIView、DestoryModelMixin
+6）UpdateAPIView --提供 put 和 patch 方法,继承自：GenericAPIView、UpdateModelMixin
+7）RetrieveUpdateAPIView --提供 get、put、patch方法,继承自： GenericAPIView、RetrieveModelMixin、UpdateModelMixin
+8)RetrieveDestroyAPIView --提供 get delete方法,继承自： GenericAPIView、RetrieveModelMixin、DestroyModelMixin
+9）RetrieveUpdateDestoryAPIView
+    提供 get、put、patch、delete方法,继承自：GenericAPIView、RetrieveModelMixin、UpdateModelMixin、DestroyModelMixin
+"""
+class BookListView(ListCreateAPIView):
     queryset = BookInfo.query.all()
     serializer_class = BookInfoModelSerializer
 
-    def get(self, request):
-        return self.list(request)
-
-    def post(self, request):
-        return self.create(request)
-
-
-class BookDetailView(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericAPIView):
+class BookDetailView(RetrieveUpdateDestroyAPIView):
     queryset = BookInfo.query.all()
     serializer_class = BookInfoModelSerializer
-
-    def get(self, request, pk):
-        return self.retrieve(request, pk)
-
-    def put(self, request, pk):
-        return self.update(request, pk)
-
-    def delete(self, request, pk):
-        return self.destroy(request, pk)
