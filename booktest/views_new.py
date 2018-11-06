@@ -158,8 +158,16 @@ class BookAPIView(ModelViewSet):
     # url的配置方式, as_view({'get': 'list'})传递字典, 描述请求方法和动作的对应关系
 
     # 可以自定义附加action动作
-    @action(methods=['get'], detail=True)
+    @action(methods=['get'], detail=False)
     def latest(self, request):
         book = BookInfo.query.latest('id')
         s = self.get_serializer(book)
         return Response(s.data)
+
+
+"""
+路由Routers的用法
+对于视图集ViewSet，还可以使用Routers来帮助我们快速实现路由列表信息。
+SimpleRouter
+DefaultRouter
+"""
