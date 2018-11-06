@@ -131,10 +131,35 @@ GenericAPIView的用法
 9）RetrieveUpdateDestoryAPIView
     提供 get、put、patch、delete方法,继承自：GenericAPIView、RetrieveModelMixin、UpdateModelMixin、DestroyModelMixin
 """
-class BookListView(ListCreateAPIView):
-    queryset = BookInfo.query.all()
-    serializer_class = BookInfoModelSerializer
+# class BookListView(ListCreateAPIView):
+#     queryset = BookInfo.query.all()
+#     serializer_class = BookInfoModelSerializer
+#
+# class BookDetailView(RetrieveUpdateDestroyAPIView):
+#     queryset = BookInfo.query.all()
+#     serializer_class = BookInfoModelSerializer
 
-class BookDetailView(RetrieveUpdateDestroyAPIView):
+
+"""
+视图集用法
+视图集类不再实现get()、post()等方法，而是实现动作 action 如 list() 、create() 等。
+1）ViewSet --继承自APIView，作用也与APIView基本类似没有提供任何动作action方法，需要我们自己实现action方法。
+2）GenericViewSet --继承自GenericAPIView，作用也与GenericAPIVIew类似
+3）ModelViewSet --继承自GenericAPIVIew,
+            同时包括了ListModelMixin、RetrieveModelMixin、CreateModelMixin、UpdateModelMixin、DestroyModelMixin。
+            默认5个动作, list, create, retrieve, update, destroy
+4）ReadOnlyModelViewSet --继承自GenericAPIVIew，同时包括了ListModelMixin、RetrieveModelMixin。
+"""
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
+class BookAPIView(ModelViewSet):
     queryset = BookInfo.query.all()
     serializer_class = BookInfoModelSerializer
+    # url的配置方式, as_view({'get': 'list'})传递字典, 描述请求方法和动作的对应关系
+
+    # 可以自定义附加action动作
+    @action(methods=['get'], detail=True)
+    def latest(self, request):
+        book = BookInfo.query.latest('id')
+        s = self.get_serializer(book)
+        return Response(s.data)

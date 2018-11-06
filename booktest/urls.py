@@ -18,6 +18,10 @@ urlpatterns = [
     # url(r'^book/(?P<pk>\d+)$', views_old.BookAPIView.as_view()),
     # url(r'^heroes/$', views.HeroListView.as_view()),
     # url(r'^heroes/(?P<pk>\d+)$', views.HeroDetailView.as_view()),
-    url(r'^books/$', views_new.BookListView.as_view()),
-    url(r'^books/(?P<pk>\d+)$', views_new.BookDetailView.as_view()),
+    # url(r'^books/$', views_new.BookListView.as_view()),
+    # url(r'^books/(?P<pk>\d+)$', views_new.BookDetailView.as_view()),
+    url(r'^books/$', views_new.BookAPIView.as_view({'get': 'list', 'post': 'create'})),
+    url(r'^books/(?P<pk>\d+)$',
+        views_new.BookAPIView.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})),
+    url(r'^books/latest/$', views_new.BookAPIView.as_view({'get': 'latest'})),
 ]
