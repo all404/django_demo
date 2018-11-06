@@ -1,4 +1,6 @@
 from rest_framework.generics import GenericAPIView
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, \
+    DestroyModelMixin
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -51,29 +53,66 @@ GenericAPIView的用法
     get_serializer(self, args, *kwargs)
     get_object(self)
 """
-class BookListView(GenericAPIView):
+# class BookListView(GenericAPIView):
+#     queryset = BookInfo.query.all()
+#     serializer_class = BookInfoModelSerializer
+#
+#     def get(self, request):
+#         books = self.get_queryset()
+#         s = self.get_serializer(books, many=True)
+#         return Response(s.data)
+#
+#     def post(self, request):
+#         s = self.get_serializer(data=request.data)
+#         s.is_valid()
+#         s.save()
+#         return Response(s.validated_data)
+#
+# class BookDetailView(GenericAPIView):
+#     queryset = BookInfo.query.all()
+#     serializer_class = BookInfoModelSerializer
+#     lookup_field = 'id'
+#     lookup_url_kwarg = 'pk'
+#     def put(self, request, pk):
+#         book = self.get_object()
+#         s = self.get_serializer(book, data=request.data, partial=True)
+#         s.is_valid(raise_exception=True)
+#         s.save()  # save()方法会根据是创建还是更新,自动调用create()或者update()
+#         return Response(s.validated_data)
+
+
+"""
+扩展类用法介绍
+五个动作对应五个扩展类
+1）ListModelMixin --list(request, *args, **kwargs)方法快速实现列表视图，返回200状态码。
+2）CreateModelMixin --create(request, *args, **kwargs)方法快速实现创建资源的视图，成功返回201状态码。
+3）RetrieveModelMixin --retrieve(request, *args, **kwargs)方法，可以快速实现返回一个存在的数据对象。
+4）UpdateModelMixin --update(request, *args, **kwargs)方法，可以快速实现更新一个存在的数据对象。
+                    --partial_update(request, *args, **kwargs)方法，可以实现局部更新。
+5）DestroyModelMixin --提供destroy(request, *args, **kwargs)方法，可以快速实现删除一个存在的数据对象。
+
+
+"""
+class BookListView(ListModelMixin, CreateModelMixin, GenericAPIView):
     queryset = BookInfo.query.all()
     serializer_class = BookInfoModelSerializer
 
     def get(self, request):
-        books = self.get_queryset()
-        s = self.get_serializer(books, many=True)
-        return Response(s.data)
+        return self.list(request)
 
     def post(self, request):
-        s = self.get_serializer(data=request.data)
-        s.is_valid()
-        s.save()
-        return Response(s.validated_data)
+        return self.create(request)
 
-class BookDetailView(GenericAPIView):
+
+class BookDetailView(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericAPIView):
     queryset = BookInfo.query.all()
     serializer_class = BookInfoModelSerializer
-    lookup_field = 'id'
-    lookup_url_kwarg = 'pk'
+
+    def get(self, request, pk):
+        return self.retrieve(request, pk)
+
     def put(self, request, pk):
-        book = self.get_object()
-        s = self.get_serializer(book, data=request.data, partial=True)
-        s.is_valid(raise_exception=True)
-        s.save()  # save()方法会根据是创建还是更新,自动调用create()或者update()
-        return Response(s.validated_data)
+        return self.update(request, pk)
+
+    def delete(self, request, pk):
+        return self.destroy(request, pk)
