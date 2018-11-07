@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'users.apps.UsersConfig',  # 注册子应用
     'reqresp.apps.WeatherConfig',
     'booktest.apps.BooktestConfig',
@@ -173,5 +174,31 @@ REST_FRAMEWORK = {
         'renders.DRFJSONRenderer',
         'rest_framework.renderers.JSONRenderer',  # json渲染器
         'rest_framework.renderers.BrowsableAPIRenderer',  # 浏览API渲染器
-    )
+    ),
+    # 在全局配置默认的认证方案
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework.authentication.BasicAuthentication',   # 基本认证
+            'rest_framework.authentication.SessionAuthentication',  # session认证
+        ),
+    # 在配置文件中设置默认的权限管理类
+    'DEFAULT_PERMISSION_CLASSES': (
+            'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        ),
+    # 在全局配置限流方案
+    'DEFAULT_THROTTLE_CLASSES': (
+            'rest_framework.throttling.AnonRateThrottle',
+            'rest_framework.throttling.UserRateThrottle'
+        ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '3/minute',
+        'user': '10/minute'
+    },
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    # 配置分页
+    'DEFAULT_PAGINATION_CLASS':  'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100, # 每页数目
+    # 开启版本支持功能, 使用查询字符串携带的方式测试
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.QueryParameterVersioning',
+    # 声明自定义的异常处理
+    'EXCEPTION_HANDLER': 'exceptions.exception_handler'
 }

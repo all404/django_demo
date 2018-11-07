@@ -1,8 +1,6 @@
 from django.conf.urls import url, include
 
-from booktest import views
 from booktest import views_new
-from booktest import views_old
 
 from rest_framework import routers
 # 1） 创建router对象，并注册视图集

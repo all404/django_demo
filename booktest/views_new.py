@@ -152,9 +152,29 @@ GenericAPIView的用法
 """
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.throttling import UserRateThrottle
+
+from rest_framework.pagination import PageNumberPagination
+class LargeResultsSetPagination(PageNumberPagination):
+    """自定义分页类"""
+    page_size = 5
+    page_size_query_param = 'page_size'
+    max_page_size = 10000
+
 class BookAPIView(ModelViewSet):
     queryset = BookInfo.query.all()
     serializer_class = BookInfoModelSerializer
+
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    throttle_classes = (UserRateThrottle,)
+    # 在视图中添加filter_fields属性，指定可以过滤的字段
+    filter_fields = ('btitle', 'bread')
+    # 自定义分页控制类
+    pagination_class = LargeResultsSetPagination
+
     # url的配置方式, as_view({'get': 'list'})传递字典, 描述请求方法和动作的对应关系
 
     # 可以自定义附加action动作
@@ -162,6 +182,15 @@ class BookAPIView(ModelViewSet):
     def latest(self, request):
         book = BookInfo.query.latest('id')
         s = self.get_serializer(book)
+
+        # 测试获取版本信息
+        if request.version == '1.0':
+            print(request.version)
+        else:
+            print('其他版本')
+
+        # 测试异常捕获
+        b = 1/0
         return Response(s.data)
 
 
@@ -171,3 +200,54 @@ class BookAPIView(ModelViewSet):
 SimpleRouter
 DefaultRouter
 """
+
+
+"""
+认证, 权限, 限流, 过滤, 分页, 版本, 异常处理
+1)认证Authentication
+    可以在配置文件中配置全局默认的认证方案;
+    也可以在每个视图中通过设置authentication_classes属性来设置.
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+2)权限Permissions
+    可以在配置文件中设置默认的权限管理类;
+    也可以在具体的视图中通过permission_classes属性来设置.
+    permission_classes = (IsAuthenticated,)
+提供的权限
+    AllowAny 允许所有用户
+    IsAuthenticated 仅通过认证的用户
+    IsAdminUser 仅管理员用户
+    IsAuthenticatedOrReadOnly 认证的用户可以完全操作，否则只能get读取
+3)限流Throttling
+    可以在配置文件中，使用DEFAULT_THROTTLE_CLASSES 和 DEFAULT_THROTTLE_RATES进行全局配置
+    也可以在具体视图中通过throttle_classess属性来配置
+        throttle_classes = (UserRateThrottle,)
+可选限流类
+    AnonRateThrottle 限制所有匿名未认证用户，使用IP区分用户,DEFAULT_THROTTLE_RATES['anon'] 来设置频次
+    UserRateThrottle 限制认证用户，使用User id 来区分,DEFAULT_THROTTLE_RATES['user'] 来设置频次
+    ScopedRateThrottle 限制用户对于每个视图的访问频次，使用ip或user id。
+4)过滤Filtering
+    对于列表数据可能需要根据字段进行过滤，我们可以通过添加django-fitlter扩展来增强支持。
+        pip insall django-filter
+        安装好之后要注册到配置的INSTALLED_APPS列表中
+5)分页Pagination
+    我们可以在配置文件中设置全局的分页方式;
+    也可通过自定义Pagination类，来为视图添加不同分页行为。在视图中通过pagination_clas属性来指明。
+    可选分页器
+        PageNumberPagination
+            GET  http://api.example.org/books/?page=4
+        LimitOffsetPagination
+            GET http://api.example.org/books/?limit=100&offset=400
+6)版本Versioning
+    在需要获取请求的版本号时，可以通过request.version来获取。
+    开启版本支持功能，需要在配置文件中设置DEFAULT_VERSIONING_CLASS
+    支持的版本处理方式
+        AcceptHeaderVersioning 请求头中传递的Accept携带version
+        URLPathVersioning URL路径中携带
+        NamespaceVersioning 命名空间中定义
+        HostNameVersioning 主机域名携带
+        QueryParameterVersioning 查询字符串携带
+7)异常处理 Exceptions
+    REST framework提供了异常处理，我们可以自定义异常处理函数
+    在配置文件中声明自定义的异常处理
+"""
+

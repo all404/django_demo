@@ -1,0 +1,188 @@
+DRF框架(Django REST framework)
+
+1.认证Authentication
+
+	可以在配置文件中配置全局默认的认证方案
+		REST_FRAMEWORK = {
+			'DEFAULT_AUTHENTICATION_CLASSES': (
+					'rest_framework.authentication.BasicAuthentication',   # 基本认证
+					'rest_framework.authentication.SessionAuthentication',  # session认证
+				)
+			}
+	也可以在每个视图中通过设置authentication_classess属性来设置
+		class ExampleView(APIView):
+			authentication_classes = (SessionAuthentication, BasicAuthentication)
+			...
+			
+2.权限Permissions
+
+	可以在配置文件中设置默认的权限管理类，如
+		REST_FRAMEWORK = {
+			'DEFAULT_PERMISSION_CLASSES': (
+				'rest_framework.permissions.IsAuthenticated',
+			)
+		}
+	也可以在具体的视图中通过permission_classes属性来设置
+		class ExampleView(APIView):
+			permission_classes = (IsAuthenticated,)
+			...			
+	1>提供的权限
+		AllowAny 允许所有用户
+		IsAuthenticated 仅通过认证的用户
+		IsAdminUser 仅管理员用户
+		IsAuthenticatedOrReadOnly 认证的用户可以完全操作，否则只能get读取
+	2>自定义权限
+		需继承rest_framework.permissions.BasePermission父类，并实现以下两个任何一个方法或全部
+			.has_permission(self, request, view)
+			是否可以访问视图， view表示当前视图对象
+			
+			.has_object_permission(self, request, view, obj)
+			是否可以访问数据对象， view表示当前视图， obj为数据对象
+			
+3.限流Throttling
+
+	可以在配置文件中，使用DEFAULT_THROTTLE_CLASSES 和 DEFAULT_THROTTLE_RATES进行全局配置，
+		REST_FRAMEWORK = {
+			'DEFAULT_THROTTLE_CLASSES': (
+				'rest_framework.throttling.AnonRateThrottle',
+				'rest_framework.throttling.UserRateThrottle'
+			),
+			'DEFAULT_THROTTLE_RATES': {
+				'anon': '100/day',
+				'user': '1000/day'
+			}
+		}
+		DEFAULT_THROTTLE_RATES 可以使用 second, minute, hour 或day来指明周期。
+	也可以在具体视图中通过throttle_classess属性来配置
+		class ExampleView(APIView):
+			throttle_classes = (UserRateThrottle,)
+			...
+	1>可选限流类
+		1） AnonRateThrottle
+			限制所有匿名未认证用户，使用IP区分用户。
+			使用DEFAULT_THROTTLE_RATES['anon'] 来设置频次
+		2）UserRateThrottle
+			限制认证用户，使用User id 来区分。
+			使用DEFAULT_THROTTLE_RATES['user'] 来这是频次
+		3）ScopedRateThrottle
+			限制用户对于每个视图的访问频次，使用ip或user id。
+			
+4.过滤Filtering
+	对于列表数据可能需要根据字段进行过滤，我们可以通过添加django-fitlter扩展来增强支持。
+		pip insall django-filter
+	在配置文件中增加过滤后端的设置：
+		REST_FRAMEWORK = {
+			'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
+		}	
+	在视图中添加filter_fields属性，指定可以过滤的字段
+		class BookListView(ListAPIView):
+			queryset = BookInfo.objects.all()
+			serializer_class = BookInfoSerializer
+			filter_fields = ('btitle', 'bread')
+			
+5.分页Pagination
+
+	在配置文件中设置全局的分页方式，如：
+		REST_FRAMEWORK = {
+			'DEFAULT_PAGINATION_CLASS':  'rest_framework.pagination.PageNumberPagination',
+			'PAGE_SIZE': 100  # 每页数目
+		}
+	也可通过自定义Pagination类，来为视图添加不同分页行为。在视图中通过pagination_clas属性来指明。
+		class LargeResultsSetPagination(PageNumberPagination):
+			page_size = 1000
+			page_size_query_param = 'page_size'
+			max_page_size = 10000
+		class BookDetailView(RetrieveAPIView):
+			...
+			pagination_class = LargeResultsSetPagination
+			...
+	1>可选分页器
+		1） PageNumberPagination
+			前端访问网址形式：
+				GET  http://api.example.org/books/?page=4
+			可以在子类中定义的属性：
+				page_size 每页数目
+				page_query_param 前端发送的页数关键字名，默认为"page"
+				page_size_query_param 前端发送的每页数目关键字名，默认为None
+				max_page_size 前端最多能设置的每页数量
+		2）LimitOffsetPagination
+			前端访问网址形式：
+				GET http://api.example.org/books/?limit=100&offset=400
+			可以在子类中定义的属性：
+				default_limit 默认限制，默认值与PAGE_SIZE设置一直
+				limit_query_param limit参数名，默认'limit'
+				offset_query_param offset参数名，默认'offset'
+				max_limit 最大limit限制，默认None
+		
+6.版本Versioning
+
+	在需要获取请求的版本号时，可以通过request.version来获取。
+	开启版本支持功能，需要在配置文件中设置DEFAULT_VERSIONING_CLASS
+		REST_FRAMEWORK = {
+			'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning'
+		}
+	其他可选配置：
+		DEFAULT_VERSION 默认版本号，默认值为None
+		ALLOWED_VERSIONS 允许请求的版本号，默认值为None
+		VERSION_PARAM 识别版本号参数的名称，默认值为'version'
+	
+	支持的版本处理方式
+		1） AcceptHeaderVersioning
+			请求头中传递的Accept携带version
+			GET /bookings/ HTTP/1.1
+			Host: example.com
+			Accept: application/json; version=1.0
+		2）URLPathVersioning
+			URL路径中携带
+			urlpatterns = [
+				url(
+					r'^(?P<version>(v1|v2))/bookings/$',
+					bookings_list,
+					name='bookings-list'
+				),
+			]
+		3）NamespaceVersioning
+			命名空间中定义
+			urlpatterns = [
+				url(r'^$', bookings_list, name='bookings-list'),
+				url(r'^(?P<pk>[0-9]+)/$', bookings_detail, name='bookings-detail')
+			]
+		4）HostNameVersioning
+			主机域名携带
+			GET /bookings/ HTTP/1.1
+			Host: v1.example.com
+			Accept: application/json
+		5）QueryParameterVersioning
+			查询字符串携带
+			GET /something/?version=0.1 HTTP/1.1
+			Host: example.com
+			Accept: application/json
+			
+7.异常处理 Exceptions
+
+	REST framework提供了异常处理，我们可以自定义异常处理函数。
+		from rest_framework.views import exception_handler
+		def custom_exception_handler(exc, context):
+			# 先调用REST framework默认的异常处理方法获得标准错误响应对象
+			response = exception_handler(exc, context)
+			# 在此处补充自定义的异常处理
+			if response is not None:
+				response.data['status_code'] = response.status_code
+			return response
+	在配置文件中声明自定义的异常处理
+		REST_FRAMEWORK = {
+			'EXCEPTION_HANDLER': 'my_project.my_app.utils.custom_exception_handler'
+		}
+	
+	REST framework定义的异常
+		APIException 所有异常的父类
+		ParseError 解析错误
+		AuthenticationFailed 认证失败
+		NotAuthenticated 尚未认证
+		PermissionDenied 权限决绝
+		NotFound 未找到
+		MethodNotAllowed 请求方式不支持
+		NotAcceptable 要获取的数据格式不支持
+		Throttled 超过限流次数
+		ValidationError 校验失败
+		
